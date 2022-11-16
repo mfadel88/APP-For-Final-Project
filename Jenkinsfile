@@ -1,14 +1,10 @@
 pipeline {
     agent { label 'slave1' }
-    // parameters{
-    //     choice(name: 'ENV', choices: {'dev', 'test', 'prod','main'})
-    // }
     stages {
         stage('Build') {
      steps {
                 script {
                      withCredentials([usernamePassword(credentialsId: 'Docker-Hub-user', passwordVariable: 'pass', usernameVariable: 'user')]) {
-                    // if (env.BRANCH_NAME == 'main') {
                         sh """
                         docker login -u $user -p $pass
                         docker build -t mfadel8/app:$BUILD_NUMBER .
@@ -29,15 +25,18 @@ pipeline {
         stage('Deploy') {
         steps {
                 script {               
-                // if (env.BRANCH_NAME == 'prod' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'test') {
-                withCredentials([file(credentialsId: 'JenkinsConfig-minikube', variable: 'cfg')]){
+                withCredentials([file(credentialsId: 'k8s-file', variable: 'serviceAcc')]){
                             sh """
+                            gcloud auth activate-service-account --key-file="$serviceAcc"
+                            gcloud container clusters get-credentials private-k8s-cluster --zone us-central1-a --project final-proj-fadel
+
+                            
                             export NUM=\$(cat ../build)
                             mv Deployment/deploy.yaml Deployment/deploy
                             cat Deployment/deploy | envsubst > Deployment/deploy.yaml
                             rm -f Deployment/deploy
-                            kubectl apply --kubeconfig=${cfg} -f Deployment/service.yaml
-                            kubectl apply --kubeconfig=${cfg} -f Deployment/deploy.yaml
+                            kubectl apply -f Deployment/service.yaml
+                            kubectl apply -f Deployment/deploy.yaml
                             """
                             }
                         // } 
