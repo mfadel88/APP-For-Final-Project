@@ -25,7 +25,7 @@ pipeline {
         stage('Deploy') {
         steps {
                 script {               
-                withCredentials([file(credentialsId: 'k8s-file', variable: 'serviceAcc')]){
+                withCredentials([file(credentialsId: 'slave-key', variable: 'serviceAcc')]){
                             sh """
                             gcloud auth activate-service-account --key-file="$serviceAcc"
                             gcloud container clusters get-credentials private-k8s-cluster --zone us-central1-a --project final-proj-fadel
