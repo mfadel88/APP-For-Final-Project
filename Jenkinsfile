@@ -7,7 +7,7 @@ pipeline {
         stage('Build') {
      steps {
                 script {
-                     withCredentials([usernamePassword(credentialsId: 'dockerHub-cred', passwordVariable: 'pass', usernameVariable: 'user')]) {
+                     withCredentials([usernamePassword(credentialsId: 'Docker-Hub-user', passwordVariable: 'pass', usernameVariable: 'user')]) {
                     // if (env.BRANCH_NAME == 'main') {
                         sh """
                         docker login -u $user -p $pass
