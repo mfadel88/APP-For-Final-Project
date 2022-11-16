@@ -8,7 +8,7 @@ pipeline {
      steps {
                 script {
                      withCredentials([usernamePassword(credentialsId: 'dockerHub-cred', passwordVariable: 'pass', usernameVariable: 'user')]) {
-                    if (env.BRANCH_NAME == 'main') {
+                    // if (env.BRANCH_NAME == 'main') {
                         sh """
                         docker login -u $user -p $pass
                         docker build -t mfadel8/app:$BUILD_NUMBER .
@@ -16,7 +16,7 @@ pipeline {
                         echo ${BUILD_NUMBER} > ../build
                         """
                     
-                       }
+                    //    }
                      }
                 }
                  
@@ -29,7 +29,7 @@ pipeline {
         stage('Deploy') {
         steps {
                 script {               
-                if (env.BRANCH_NAME == 'prod' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'test') {
+                // if (env.BRANCH_NAME == 'prod' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'test') {
                 withCredentials([file(credentialsId: 'JenkinsConfig-minikube', variable: 'cfg')]){
                             sh """
                             export NUM=\$(cat ../build)
@@ -40,7 +40,7 @@ pipeline {
                             kubectl apply --kubeconfig=${cfg} -f Deployment/deploy.yaml
                             """
                             }
-                        } 
+                        // } 
 
                     }
                 }
